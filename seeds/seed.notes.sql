@@ -2,7 +2,7 @@ INSERT INTO notes
     (note_title, content, folder)
 VALUES
 ('Finish Thinkful module', 
-   `create noteful api, update client-side, complete checkpoint 'deploy to production`, 
+   'create noteful api, update client-side, complete checkpoint "deploy to production"', 
    1
 ),
 ('Rocky', 
