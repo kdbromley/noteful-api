@@ -1,6 +1,6 @@
 const path = require('path');
 const express = require('express');
-//const xss = require('xss')
+const xss = require('xss')
 const NotesService = require('./notes-services')
 
 const notesRouter = express.Router();
@@ -8,7 +8,7 @@ const jsonParser = express.json();
 
 const serializeNote = note => ({
     id: note.id,
-    title: xss(note.note_title),
+    note_title: xss(note.note_title),
     content: xss(note.content),
     date_created: note.date_created,
     folder: note.folder,
@@ -26,20 +26,21 @@ notesRouter
                 res.json(notes)
             })
             .catch(next)
+        } else {
+            NotesService.getNotesByFolder(
+                req.app.get('db'),
+                folderId
+            )
+            .then(notes => {
+                res.json(notes)
+            })
+            .catch(next)
         }
         
-        NotesService.getNotesByFolder(
-            req.app.get('db'),
-            folderId
-        )
-        .then(notes => {
-            res.json(notes)
-        })
-        .catch(next)
     })
     .post(jsonParser, (req, res, next) => {
         const { note_title, content, folder } = req.body;
-        const newNote = { note_title, folder};
+        const newNote = { note_title, folder };
 
         for (const [key, value] of Object.entries(newNote)) {
             if (value == null) {
@@ -80,7 +81,6 @@ notesRouter
                 })
             }
             res.note = note;
-            console.log(res.note)
             next();
         })
         .catch(next)
@@ -96,7 +96,9 @@ notesRouter
             noteId
         )
         .then(() => {
-            res.status(204).end()
+            res
+            .status(204)
+            .end()
         })
         .catch(next)
     })
